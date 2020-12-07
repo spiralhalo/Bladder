@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "bladder",
+  "version": "${version}",
+
+  "name": "Bladder",
+  "description": "Gotta relieve yourself, or ELSE.",
+  "authors": [
+    "spiralhalo"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "All rights reserved",
+  "icon": "assets/bladder/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "spiralhalo.bladder.BladderMod"
+    ],
+    "client": [
+      "spiralhalo.bladder.BladderModClient"
+    ]
+  },
+  "mixins": [
+    "bladder.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

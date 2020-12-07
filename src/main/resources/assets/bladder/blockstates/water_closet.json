@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "bladder:block/water_closet" },
+    "facing=east":  { "model": "bladder:block/water_closet", "y":  90},
+    "facing=south": { "model": "bladder:block/water_closet", "y": 180 },
+    "facing=west":  { "model": "bladder:block/water_closet", "y": 270 }
+  }
+}
