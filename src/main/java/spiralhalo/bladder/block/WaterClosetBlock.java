@@ -39,8 +39,8 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
     public static final BooleanProperty OCCUPIED;
 
     private static final double
-            xMin1 = 0.25,   yMin1 = 0.0, zMin1 = 0.0625, xMax1 = 0.75,   yMax1 = 0.4375, zMax1 = 0.6875,
-            xMin2 = 0.1875, yMin2 = 0.0, zMin2 = 0.6875, xMax2 = 0.8125, yMax2 = 1.0,    zMax2 = 1.0;
+            xMin1 = 0.1875, yMin1 = 0.0, zMin1 = 0.0,    xMax1 = 0.8125, yMax1 = 0.4375, zMax1 = 0.6875,
+            xMin2 = 0.125,  yMin2 = 0.0, zMin2 = 0.6875, xMax2 = 0.875,  yMax2 = 1.0,    zMax2 = 1.0;
     private static final VoxelShape outlineNorth;
     private static final VoxelShape outlineEast;
     private static final VoxelShape outlineSouth;
@@ -72,38 +72,42 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         if ((state.get(FACING).getHorizontal() + 3) %4 == hit.getSide().getHorizontal()) {
 
             if (!world.isClient) {
-                player.sendMessage(new LiteralText("Flushed your hopes and dreams down the drain."), false);
+                player.sendMessage(new LiteralText("Flushed the bad stuff out of this world."), false);
             }
 
             return ActionResult.SUCCESS;
 
         } else if (hit.getSide().equals(Direction.UP)) {
 
-            if (state.get(OCCUPIED)) {
-                List<WaterClosetRideableEntity> wcEntities = world.getEntitiesByType(
-                        WaterClosetRideableEntity.WATER_CLOSET_ENTITY,
-                        new Box( pos.getX(), pos.getY(), pos.getZ(),
-                        pos.getX() + 1, pos.getY() + 1, pos.getZ() +1),
-                        entity -> {return true;} );
-                for (WaterClosetRideableEntity e:wcEntities) {
-                    if (e.hasPassengers()) {
-                        return ActionResult.CONSUME;
+            if (!world.isClient) {
+                if (state.get(OCCUPIED)) {
+                    List<WaterClosetRideableEntity> wcEntities = world.getEntitiesByType(
+                            WaterClosetRideableEntity.WATER_CLOSET_ENTITY,
+                            new Box(pos.getX(), pos.getY(), pos.getZ(),
+                                    pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
+                            entity -> {
+                                return true;
+                            });
+                    for (WaterClosetRideableEntity e : wcEntities) {
+                        if (e.hasPassengers()) {
+                            return ActionResult.CONSUME;
+                        }
                     }
                 }
-            }
 
-            Entity rideable = WaterClosetRideableEntity.WATER_CLOSET_ENTITY.create(world);
+                Entity rideable = WaterClosetRideableEntity.WATER_CLOSET_ENTITY.create(world);
 
-            if (rideable != null) {
-                world.setBlockState(pos, state.with(OCCUPIED, true));
+                if (rideable != null) {
+                    world.setBlockState(pos, state.with(OCCUPIED, true));
 
-                rideable.updatePositionAndAngles(
-                        pos.getX() + 0.5 + state.get(FACING).getOffsetX() * 0.1,
-                        pos.getY() + 0.5,
-                        pos.getZ() + 0.5 + state.get(FACING).getOffsetZ() * 0.1,
-                        state.get(FACING).asRotation(), 0);
-                world.spawnEntity(rideable);
-                player.startRiding(rideable);
+                    rideable.updatePositionAndAngles(
+                            pos.getX() + 0.5 + state.get(FACING).getOffsetX() * 0.1,
+                            pos.getY() + 0.5,
+                            pos.getZ() + 0.5 + state.get(FACING).getOffsetZ() * 0.1,
+                            state.get(FACING).asRotation(), 0);
+                    world.spawnEntity(rideable);
+                    player.startRiding(rideable);
+                }
             }
 
             return ActionResult.CONSUME;
@@ -120,11 +124,11 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         switch (ctx.getPlayerFacing()){
-            case SOUTH: return (BlockState)this.getDefaultState().with(FACING, Direction.NORTH).with(OCCUPIED, false);
-            case WEST: return (BlockState)this.getDefaultState().with(FACING, Direction.EAST).with(OCCUPIED, false);
-            case EAST: return (BlockState)this.getDefaultState().with(FACING, Direction.WEST).with(OCCUPIED, false);
+            case SOUTH: return getDefaultState().with(FACING, Direction.NORTH).with(OCCUPIED, false);
+            case WEST: return getDefaultState().with(FACING, Direction.EAST).with(OCCUPIED, false);
+            case EAST: return getDefaultState().with(FACING, Direction.WEST).with(OCCUPIED, false);
             case NORTH:
-            default: return (BlockState)this.getDefaultState().with(FACING, Direction.SOUTH).with(OCCUPIED, false);
+            default: return getDefaultState().with(FACING, Direction.SOUTH).with(OCCUPIED, false);
         }
     }
 
