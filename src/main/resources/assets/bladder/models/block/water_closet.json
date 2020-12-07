@@ -6,7 +6,7 @@
 		"2": "bladder:block/water_closet_bowl_up",
 		"3": "bladder:block/water_closet_tank_body",
 		"4": "bladder:block/water_closet_tank_side",
-		"particle": "water_closet_bowl_down"
+		"particle": "bladder:block/water_closet_bowl_down"
 	},
 	"elements": [
 		{
