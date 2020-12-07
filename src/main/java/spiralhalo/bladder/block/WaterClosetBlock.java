@@ -5,39 +5,30 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Packet;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import spiralhalo.bladder.BladderModClient;
-import spiralhalo.bladder.network.EntitySpawnPacket;
+import spiralhalo.bladder.util.NetworkUtils;
 import spiralhalo.bladder.util.VoxelShapeUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 public class WaterClosetBlock extends HorizontalFacingBlock {
 
@@ -270,7 +261,7 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
         @Override
         public Packet<?> createSpawnPacket() {
-            return ServerSidePacketRegistry.INSTANCE.toPacket(BladderModClient.packetId, EntitySpawnPacket.createBuffer(this));
+            return ServerSidePacketRegistry.INSTANCE.toPacket(BladderModClient.packetId, NetworkUtils.createEntityDataPacket(this));
         }
 
         @Override
@@ -278,23 +269,6 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
             if (hasPassengers()) {
                 return getPassengerList().get(0);
             }
-            return null;
-        }
-    }
-
-    public static class WaterClosetRideableEntityRenderer extends EntityRenderer<WaterClosetRideableEntity> {
-
-        public WaterClosetRideableEntityRenderer(EntityRenderDispatcher dispatcher) {
-            super(dispatcher);
-        }
-
-        @Override
-        public boolean shouldRender(WaterClosetRideableEntity entity, Frustum frustum, double d, double e, double f) {
-            return false;
-        }
-
-        @Override
-        public Identifier getTexture(WaterClosetRideableEntity entity) {
             return null;
         }
     }
