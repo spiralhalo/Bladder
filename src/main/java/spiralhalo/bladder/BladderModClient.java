@@ -16,18 +16,18 @@ import net.minecraft.util.registry.Registry;
 import spiralhalo.bladder.util.NetworkUtils;
 import spiralhalo.bladder.util.RenderingUtils;
 
-import static spiralhalo.bladder.block.WaterClosetBlock.WaterClosetRideableEntity.WATER_CLOSET_ENTITY;
+import static spiralhalo.bladder.block.WaterClosetBlock.WaterClosetEntity.WATER_CLOSET_ENTITY;
 
 public class BladderModClient implements ClientModInitializer, PacketConsumer {
 
-    public static final Identifier packetId = new Identifier("bladder", "spawn_entity");
+    public static final Identifier SPAWN_ENTITY_PACKET_ID = BladderMod.createId("spawn_entity");
 
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.INSTANCE.register(WATER_CLOSET_ENTITY, (dispatcher, context) -> {
             return RenderingUtils.createEmptyRenderer(dispatcher);
         });
-        ClientSidePacketRegistry.INSTANCE.register(packetId, this);
+        ClientSidePacketRegistry.INSTANCE.register(SPAWN_ENTITY_PACKET_ID, this);
     }
 
     @Environment(EnvType.CLIENT)

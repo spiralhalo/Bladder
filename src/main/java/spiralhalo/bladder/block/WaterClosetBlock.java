@@ -24,7 +24,9 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import spiralhalo.bladder.BladderMod;
 import spiralhalo.bladder.BladderModClient;
+import spiralhalo.bladder.component.BladderComponents;
 import spiralhalo.bladder.util.NetworkUtils;
 import spiralhalo.bladder.util.VoxelShapeUtils;
 
@@ -32,10 +34,10 @@ import java.util.List;
 
 public class WaterClosetBlock extends HorizontalFacingBlock {
 
-    public static final Identifier id = new Identifier("bladder", "water_closet");
-    public static final Identifier entityId = new Identifier("bladder", "water_closet_entity");
-    public static final WaterClosetBlock block;
-    public static final WaterClosetBlockItem blockItem;
+    public static final Identifier ID = BladderMod.createId("water_closet");
+    public static final Identifier ENTITY_ID = BladderMod.createId("water_closet_entity");
+    public static final WaterClosetBlock BLOCK;
+    public static final WaterClosetBlockItem BLOCK_ITEM;
     public static final BooleanProperty OCCUPIED;
 
     private static final double
@@ -57,9 +59,9 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         outlineSouth = VoxelShapeUtils.rotateCW(outlineEast, 1);
         outlineWest = VoxelShapeUtils.rotateCW(outlineSouth, 1);
 
-        block = new WaterClosetBlock();
+        BLOCK = new WaterClosetBlock();
 
-        blockItem = new WaterClosetBlockItem(block);
+        BLOCK_ITEM = new WaterClosetBlockItem(BLOCK);
     }
 
     public WaterClosetBlock() {
@@ -81,21 +83,17 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
             if (!world.isClient) {
                 if (state.get(OCCUPIED)) {
-                    List<WaterClosetRideableEntity> wcEntities = world.getEntitiesByType(
-                            WaterClosetRideableEntity.WATER_CLOSET_ENTITY,
-                            new Box(pos.getX(), pos.getY(), pos.getZ(),
-                                    pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
-                            entity -> {
-                                return true;
-                            });
-                    for (WaterClosetRideableEntity e : wcEntities) {
+                    List<WaterClosetEntity> wcEntities = world.getEntitiesByType(WaterClosetEntity.WATER_CLOSET_ENTITY,
+                            new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
+                            entity -> true);
+                    for (WaterClosetEntity e : wcEntities) {
                         if (e.hasPassengers()) {
                             return ActionResult.CONSUME;
                         }
                     }
                 }
 
-                Entity rideable = WaterClosetRideableEntity.WATER_CLOSET_ENTITY.create(world);
+                Entity rideable = WaterClosetEntity.WATER_CLOSET_ENTITY.create(world);
 
                 if (rideable != null) {
                     world.setBlockState(pos, state.with(OCCUPIED, true));
@@ -160,21 +158,23 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
     }
 
     @SuppressWarnings("EntityConstructor")
-    public static class WaterClosetRideableEntity extends Entity {
+    public static class WaterClosetEntity extends Entity {
 
         public static EntityType WATER_CLOSET_ENTITY;
 
         static {
-            WATER_CLOSET_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, WaterClosetRideableEntity::new).
-                    dimensions(EntityDimensions.fixed(0.5F, 0.05F)).build();
+            WATER_CLOSET_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, WaterClosetEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.5F, 0.05F)).build();
         }
 
         private boolean adjusted;
+        private int tick;
 
-        private WaterClosetRideableEntity(EntityType type, World world) {
+        private WaterClosetEntity(EntityType type, World world) {
             super(type, world);
             noClip = true;
             adjusted = false;
+            tick = 0;
         }
 
         @Override
@@ -208,11 +208,18 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
                 } else {
 
+                    Entity primaryPassenger = getPrimaryPassenger();
+                    if (primaryPassenger instanceof PlayerEntity) {
+                        tick++;
+                        if (tick > 4) {
+                            BladderComponents.BLADDER_POINT.get(primaryPassenger).onRelieve(1);
+                            BladderComponents.BLADDER_POINT.sync(primaryPassenger);
+                            tick = 0;
+                        }
+                    }
                     List<Entity> otherWcEntities = world.getOtherEntities(this,
                             new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1),
-                            entity -> {
-                                return entity instanceof WaterClosetRideableEntity;
-                            });
+                            entity -> entity instanceof WaterClosetEntity);
 
                     for (Entity e : otherWcEntities) {
                         if (e.hasPassengers()) {
@@ -265,7 +272,8 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
         @Override
         public Packet<?> createSpawnPacket() {
-            return ServerSidePacketRegistry.INSTANCE.toPacket(BladderModClient.packetId, NetworkUtils.createEntityDataPacket(this));
+            return ServerSidePacketRegistry.INSTANCE.toPacket(BladderModClient.SPAWN_ENTITY_PACKET_ID,
+                    NetworkUtils.createEntityDataPacket(this));
         }
 
         @Override
