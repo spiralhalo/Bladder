@@ -22,10 +22,10 @@
       "spiralhalo.bladder.BladderMod"
     ],
     "client": [
-      "spiralhalo.bladder.BladderModClient"
+      "spiralhalo.bladder.client.BladderModClient"
     ],
     "cardinal-components-entity": [
-      "spiralhalo.bladder.component.BladderComponents"
+      "spiralhalo.bladder.mechanics.BladderComponents"
     ]
   },
   "mixins": [

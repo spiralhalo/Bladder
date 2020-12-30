@@ -1,4 +1,4 @@
-package spiralhalo.bladder.damage;
+package spiralhalo.bladder.mechanics;
 
 import net.minecraft.entity.damage.DamageSource;
 

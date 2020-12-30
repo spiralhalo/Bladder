@@ -2,5 +2,6 @@
   "death.attack.bladder.unrelieved": "%1$s was unable to relieve themselves.",
   "death.attack.bladder.unrelieved.player": "%1$s was unable to relieve themselves whilst fighting %2$s",
   "block.bladder.water_closet": "Water Closet",
-  "entity.bladder.water_closet_entity": "Water Closet Seat"
+  "entity.bladder.water_closet_entity": "Water Closet Seat",
+  "component.bladder.bladder_point.name": "Bladder"
 }

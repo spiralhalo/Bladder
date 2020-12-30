@@ -25,8 +25,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import spiralhalo.bladder.BladderMod;
-import spiralhalo.bladder.BladderModClient;
-import spiralhalo.bladder.component.BladderComponents;
+import spiralhalo.bladder.client.BladderModClient;
+import spiralhalo.bladder.mechanics.BladderComponents;
 import spiralhalo.bladder.util.NetworkUtils;
 import spiralhalo.bladder.util.VoxelShapeUtils;
 
