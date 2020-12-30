@@ -16,7 +16,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
-public class RenderingUtils {
+public class RenderingUtil {
 
     public static EmptyRenderer createEmptyRenderer(EntityRenderDispatcher dispatcher) {
         return new EmptyRenderer(dispatcher);

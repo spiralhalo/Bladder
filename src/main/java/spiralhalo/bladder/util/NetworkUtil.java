@@ -17,7 +17,7 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.UUID;
 
-public class NetworkUtils {
+public class NetworkUtil {
 
     public static PacketByteBuf createEntityDataPacket(Entity e) {
         PacketByteBuf out = new PacketByteBuf(Unpooled.buffer());

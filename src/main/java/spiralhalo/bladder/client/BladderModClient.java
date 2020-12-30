@@ -15,8 +15,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import spiralhalo.bladder.BladderMod;
-import spiralhalo.bladder.util.NetworkUtils;
-import spiralhalo.bladder.util.RenderingUtils;
+import spiralhalo.bladder.util.NetworkUtil;
+import spiralhalo.bladder.util.RenderingUtil;
 
 import static spiralhalo.bladder.block.WaterClosetBlock.WaterClosetEntity.WATER_CLOSET_ENTITY;
 
@@ -28,7 +28,7 @@ public class BladderModClient implements ClientModInitializer, PacketConsumer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.INSTANCE.register(WATER_CLOSET_ENTITY, (dispatcher, context) ->
-            RenderingUtils.createEmptyRenderer(dispatcher));
+            RenderingUtil.createEmptyRenderer(dispatcher));
         ClientSidePacketRegistry.INSTANCE.register(SPAWN_ENTITY_PACKET_ID, this);
         HudRenderCallback.EVENT.register(bladderHud);
     }
@@ -36,7 +36,7 @@ public class BladderModClient implements ClientModInitializer, PacketConsumer {
     @Environment(EnvType.CLIENT)
     @Override
     public void accept(PacketContext packetContext, PacketByteBuf packetByteBuf) {
-        NetworkUtils.EntityPacketData data = NetworkUtils.readEntityDataPacket(packetByteBuf);
+        NetworkUtil.EntityPacketData data = NetworkUtil.readEntityDataPacket(packetByteBuf);
         packetContext.getTaskQueue().execute(() -> {
             ClientWorld world = MinecraftClient.getInstance().world;
             Entity entity = Registry.ENTITY_TYPE.get(data.rawType).create(world);

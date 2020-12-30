@@ -13,7 +13,7 @@ package spiralhalo.bladder.util;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 
-public class VoxelShapeUtils {
+public class VoxelShapeUtil {
 
     public static VoxelShape rotateCW(VoxelShape shape, int amount) {
         if (amount < 1 || amount > 3) {

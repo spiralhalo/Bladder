@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 import spiralhalo.bladder.BladderMod;
 import spiralhalo.bladder.client.BladderModClient;
 import spiralhalo.bladder.mechanics.BladderComponents;
-import spiralhalo.bladder.util.NetworkUtils;
-import spiralhalo.bladder.util.VoxelShapeUtils;
+import spiralhalo.bladder.util.NetworkUtil;
+import spiralhalo.bladder.util.VoxelShapeUtil;
 
 import java.util.List;
 
@@ -55,9 +55,9 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         final VoxelShape cuboid2 = VoxelShapes.cuboid(xMin2, yMin2, zMin2, xMax2, yMax2, zMax2);
 
         outlineNorth = VoxelShapes.union(cuboid1, cuboid2);
-        outlineEast = VoxelShapeUtils.rotateCW(outlineNorth, 1);
-        outlineSouth = VoxelShapeUtils.rotateCW(outlineEast, 1);
-        outlineWest = VoxelShapeUtils.rotateCW(outlineSouth, 1);
+        outlineEast = VoxelShapeUtil.rotateCW(outlineNorth, 1);
+        outlineSouth = VoxelShapeUtil.rotateCW(outlineEast, 1);
+        outlineWest = VoxelShapeUtil.rotateCW(outlineSouth, 1);
 
         BLOCK = new WaterClosetBlock();
 
@@ -273,7 +273,7 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         @Override
         public Packet<?> createSpawnPacket() {
             return ServerSidePacketRegistry.INSTANCE.toPacket(BladderModClient.SPAWN_ENTITY_PACKET_ID,
-                    NetworkUtils.createEntityDataPacket(this));
+                    NetworkUtil.createEntityDataPacket(this));
         }
 
         @Override
