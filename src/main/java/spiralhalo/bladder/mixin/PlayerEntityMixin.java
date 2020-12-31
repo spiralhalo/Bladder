@@ -14,16 +14,11 @@ import spiralhalo.bladder.mechanics.BladderComponents;
 public class PlayerEntityMixin {
     @Inject(at = @At("HEAD"), method = "eatFood")
     public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> info) {
-        if (!world.isClient && stack.isFood()) {
-            PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-            Object provider = playerEntity;
-
-            BladderComponent bladderComponent = BladderComponents.BLADDER_POINT.get(provider);
-            bladderComponent.onEat(stack);
-
-            BladderComponents.BLADDER_POINT.sync(provider);
-
-            bladderComponent.afterEat(world);
-        }
+        if (world.isClient || !stack.isFood()) return;
+        PlayerEntity playerEntity = (PlayerEntity) (Object) this;
+        BladderComponent bladderComponent = BladderComponents.BLADDER_POINT.get(playerEntity);
+        bladderComponent.onEat(stack);
+        BladderComponents.BLADDER_POINT.sync(playerEntity);
+        bladderComponent.afterEat(world);
     }
 }
