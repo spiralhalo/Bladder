@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import spiralhalo.bladder.block.WaterClosetBlock;
+import spiralhalo.bladder.block.WaterClosetBlockTypes;
 
 import static spiralhalo.bladder.block.WaterClosetBlock.WaterClosetEntity.WATER_CLOSET_ENTITY;
 
@@ -17,8 +18,7 @@ public class BladderMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Registry.register(Registry.BLOCK, WaterClosetBlock.ID, WaterClosetBlock.BLOCK);
-        Registry.register(Registry.ITEM, WaterClosetBlock.ID, WaterClosetBlock.BLOCK_ITEM);
+        WaterClosetBlockTypes.registerAll();
         Registry.register(Registry.ENTITY_TYPE, WaterClosetBlock.ENTITY_ID, WATER_CLOSET_ENTITY);
     }
 }

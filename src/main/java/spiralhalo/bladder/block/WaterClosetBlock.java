@@ -34,10 +34,7 @@ import java.util.List;
 
 public class WaterClosetBlock extends HorizontalFacingBlock {
 
-    public static final Identifier ID = BladderMod.createId("water_closet");
     public static final Identifier ENTITY_ID = BladderMod.createId("water_closet_entity");
-    public static final WaterClosetBlock BLOCK;
-    public static final WaterClosetBlockItem BLOCK_ITEM;
     public static final BooleanProperty OCCUPIED;
 
     private static final double
@@ -58,14 +55,13 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         outlineEast = VoxelShapeUtil.rotateCW(outlineNorth, 1);
         outlineSouth = VoxelShapeUtil.rotateCW(outlineEast, 1);
         outlineWest = VoxelShapeUtil.rotateCW(outlineSouth, 1);
-
-        BLOCK = new WaterClosetBlock();
-
-        BLOCK_ITEM = new WaterClosetBlockItem(BLOCK);
     }
 
-    public WaterClosetBlock() {
+    private final int bpReductionTick;
+
+    public WaterClosetBlock(int bpReductionTick) {
         super(FabricBlockSettings.of(Material.STONE).requiresTool().breakByTool(FabricToolTags.PICKAXES).hardness(1.5f).resistance(2f));
+        this.bpReductionTick = bpReductionTick;
     }
 
     @Override
@@ -95,7 +91,8 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
                 Entity rideable = WaterClosetEntity.WATER_CLOSET_ENTITY.create(world);
 
-                if (rideable != null) {
+                if (rideable instanceof WaterClosetEntity) {
+                    ((WaterClosetEntity) rideable).setBpReductionTick(this.bpReductionTick);
                     world.setBlockState(pos, state.with(OCCUPIED, true));
 
                     rideable.updatePositionAndAngles(
@@ -151,12 +148,6 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
         }
     }
 
-    private static class WaterClosetBlockItem extends BlockItem {
-        private WaterClosetBlockItem(Block block) {
-            super(block, new Item.Settings().group(ItemGroup.MISC));
-        }
-    }
-
     @SuppressWarnings("EntityConstructor")
     public static class WaterClosetEntity extends Entity {
 
@@ -169,12 +160,17 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
         private boolean adjusted;
         private int tick;
+        private int bpReductionTick;
 
         private WaterClosetEntity(EntityType type, World world) {
             super(type, world);
             noClip = true;
             adjusted = false;
             tick = 0;
+        }
+
+        public void setBpReductionTick(int bpReductionTick) {
+            this.bpReductionTick = bpReductionTick;
         }
 
         @Override
@@ -211,7 +207,7 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
                     Entity primaryPassenger = getPrimaryPassenger();
                     if (primaryPassenger instanceof PlayerEntity) {
                         tick++;
-                        if (tick > 4) {
+                        if (tick > bpReductionTick) {
                             BladderComponents.BLADDER_POINT.get(primaryPassenger).onRelieve(1);
                             BladderComponents.BLADDER_POINT.sync(primaryPassenger);
                             tick = 0;
