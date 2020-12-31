@@ -4,8 +4,11 @@ import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.FoodComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
@@ -39,28 +42,30 @@ public class BladderComponent implements ComponentV3, AutoSyncedComponent {
     }
 
     public void onEat(ItemStack stack) {
-        if(stack != null && stack.isFood()) {
-            this.prevBladderPoint = this.bladderPoint;
-            this.bladderPoint += stack.getItem().getFoodComponent().getHunger();
-        }
+        if (stack == null) return;
+        FoodComponent foodComponent = stack.getItem().getFoodComponent();
+        if (foodComponent == null) return;
+        this.prevBladderPoint = this.bladderPoint;
+        this.bladderPoint += foodComponent.getHunger();
     }
 
     public void afterEat(World world) {
-        if (this.bladderPoint > BladderRule.MAX_BLADDER_POINT && this.prevBladderPoint >= BladderRule.MAX_BLADDER_POINT) {
-            if (world.getBlockState(entity.getBlockPos()).isAir()) {
-                world.setBlockState(entity.getBlockPos(), Blocks.WATER.getDefaultState());
-            }
-            world.createExplosion(null, UnrelievedDamage.UNRELIEVED, null, entity.getX(), entity.getY(), entity.getZ(), 5, false, Explosion.DestructionType.NONE);
-        }
+        if (this.bladderPoint < BladderRule.MAX_BLADDER_POINT) return;
+        if (this.prevBladderPoint < BladderRule.MAX_BLADDER_POINT) return;
+        BlockPos pos = entity.getBlockPos();
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+        DamageSource source = UnrelievedDamage.UNRELIEVED;
+        Explosion.DestructionType type = Explosion.DestructionType.NONE;
+        if (world.getBlockState(pos).isAir()) world.setBlockState(pos, Blocks.WATER.getDefaultState());
+        world.createExplosion(null, source, null, x, y, z, 5, false, type);
     }
 
     public void onRelieve(int relieveAmount) {
-        if (this.bladderPoint > 0) {
-            this.prevBladderPoint = this.bladderPoint;
-            this.bladderPoint -= relieveAmount;
-            if (this.bladderPoint < 0) {
-                this.bladderPoint = 0;
-            }
-        }
+        if (this.bladderPoint <= 0) return;
+        this.prevBladderPoint = this.bladderPoint;
+        this.bladderPoint -= relieveAmount;
+        this.bladderPoint = Math.max(0, this.bladderPoint);
     }
 }

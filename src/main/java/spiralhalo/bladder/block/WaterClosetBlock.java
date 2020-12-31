@@ -224,9 +224,7 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
             if (!passengerAngleAdjusted) {
                 passenger.updatePositionAndAngles(getX(), getY() - 0.65, getZ(), yaw, 0);
                 passengerAngleAdjusted = true;
-            } else {
-                passenger.updatePosition(getX(), getY() - 0.65, getZ());
-            }
+            } else passenger.updatePosition(getX(), getY() - 0.65, getZ());
         }
 
         @Override
