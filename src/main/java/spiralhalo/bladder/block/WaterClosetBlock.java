@@ -92,7 +92,6 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
                 Entity rideable = WaterClosetEntity.WATER_CLOSET_ENTITY.create(world);
 
                 if (rideable instanceof WaterClosetEntity) {
-                    ((WaterClosetEntity) rideable).setBpReductionTick(this.bpReductionTick);
                     world.setBlockState(pos, state.with(OCCUPIED, true));
 
                     rideable.updatePositionAndAngles(
@@ -160,17 +159,15 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
         private boolean adjusted;
         private int tick;
-        private int bpReductionTick;
+
+        // this field is not saved when quitting world, don't use
+//        private int bpReductionTick;
 
         private WaterClosetEntity(EntityType type, World world) {
             super(type, world);
             noClip = true;
             adjusted = false;
             tick = 0;
-        }
-
-        public void setBpReductionTick(int bpReductionTick) {
-            this.bpReductionTick = bpReductionTick;
         }
 
         @Override
@@ -189,11 +186,11 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
 
             if (!world.isClient) {
                 BlockPos pos = getBlockPos();
-                BlockState occupiedBlock = world.getBlockState(pos);
-                if (!hasPassengers() || !(occupiedBlock.getBlock() instanceof WaterClosetBlock)) {
-
-                    if (occupiedBlock.getBlock() instanceof WaterClosetBlock) {
-                        world.setBlockState(pos, occupiedBlock.getBlock().getDefaultState()
+                BlockState worldBlockState = world.getBlockState(pos);
+                Block occupiedBlock = worldBlockState.getBlock();
+                if (!hasPassengers() || !(occupiedBlock instanceof WaterClosetBlock)) {
+                    if (occupiedBlock instanceof WaterClosetBlock) {
+                        world.setBlockState(pos, occupiedBlock.getDefaultState()
                                 .with(WaterClosetBlock.FACING, getHorizontalFacing())
                                 .with(WaterClosetBlock.OCCUPIED, false));
                     }
@@ -207,6 +204,7 @@ public class WaterClosetBlock extends HorizontalFacingBlock {
                     Entity primaryPassenger = getPrimaryPassenger();
                     if (primaryPassenger instanceof PlayerEntity) {
                         tick++;
+                        int bpReductionTick = ((WaterClosetBlock) occupiedBlock).bpReductionTick;
                         if (tick > bpReductionTick) {
                             BladderComponents.BLADDER_POINT.get(primaryPassenger).onRelieve(1);
                             BladderComponents.BLADDER_POINT.sync(primaryPassenger);
